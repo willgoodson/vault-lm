@@ -70,5 +70,5 @@ jobs:
         with:
           args: --target ${{ matrix.target }}
           tagName: v__VERSION__
-          releaseName: "Vault-LM ${{ github.ref_name }}"
+          releaseName: "Vault-LM v__VERSION__"
           releaseDraft: true

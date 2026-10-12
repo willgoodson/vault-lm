@@ -9,6 +9,7 @@
     "web": "vite web",
     "build": "vite build web",
     "dev": "node server/server.js & vite web",
+    "tauri": "tauri",
     "desktop": "tauri dev",
     "desktop:build": "tauri build",
     "test:core": "cargo test -p vaultlm-core",
