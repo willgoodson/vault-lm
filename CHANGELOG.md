@@ -2,6 +2,11 @@
 
 All notable changes to Vault-LM are listed here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Fixed
+- The Fedora/RHEL `.rpm` now installs `espeak-ng` (used for audio overviews), like the `.deb` already did.
+
 ## [0.1.0] - 2026-10-12
 
 The first release of the desktop app for macOS, Windows and Linux.
