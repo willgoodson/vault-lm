@@ -1,0 +1,43 @@
+[package]
+name = "vaultlm-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Vault-LM application core: vaults, notebooks, links, notes, study data"
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+regex = "1"
+fancy-regex = "0.14"
+serde_yaml = "0.9"
+directories = "6"
+chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
+percent-encoding = "2"
+notify = "8"
+notify-debouncer-full = "0.5"
+parking_lot = "0.12"
+rand = "0.9"
+# "remote" is enabled only because lancedb 0.40 fails to compile without it (job.rs uses a remote-only error variant)
+lancedb = { version = "0.40.0", default-features = false, features = ["remote"] }
+arrow-array = "58"
+arrow-schema = "58"
+futures = "0.3.34"
+reqwest = { version = "0.12", default-features = false, features = ["json", "stream", "rustls-tls"] }
+keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
+ocrs = "0.13"
+rten = "0.26"  # must match the version ocrs uses
+image = "0.25"
+htmd = "0.5"
+dom_smoothie = "0.18"
+zip = "9"
+pdfium-render = "0.9"
+
+[dev-dependencies]
+tempfile = "3"
+# dev-only HTTP harness so browser tests can drive the Vue UI against the Rust core (never shipped)
+axum = "0.8"
+tower-http = { version = "0.6", features = ["fs"] }

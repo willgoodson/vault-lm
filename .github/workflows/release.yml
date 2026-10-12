@@ -1,0 +1,73 @@
+# Builds installers for macOS (arm64 + x64), Windows (x64) and Linux (x64) and attaches them to a
+# draft GitHub release. Trigger: push a tag like v0.2.0, or run manually.
+# Signing is optional: with no secrets set, macOS builds are ad-hoc signed and Windows builds are
+# unsigned. Add these repo secrets later and the same workflow signs and notarizes:
+#   APPLE_CERTIFICATE, APPLE_CERTIFICATE_PASSWORD, APPLE_SIGNING_IDENTITY, APPLE_ID, APPLE_PASSWORD,
+#   APPLE_TEAM_ID (macOS), TAURI_SIGNING_PRIVATE_KEY(+_PASSWORD) (updater).
+name: release
+on:
+  push: { tags: ["v*"] }
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: macos-14, target: aarch64-apple-darwin, pdfium: pdfium-mac-arm64.tgz, lib: libpdfium.dylib }
+          - { os: macos-15-intel, target: x86_64-apple-darwin, pdfium: pdfium-mac-x64.tgz, lib: libpdfium.dylib }
+          - { os: windows-latest, target: x86_64-pc-windows-msvc, pdfium: pdfium-win-x64.tgz, lib: bin/pdfium.dll }
+          - { os: ubuntu-22.04, target: x86_64-unknown-linux-gnu, pdfium: pdfium-linux-x64.tgz, lib: lib/libpdfium.so }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: dtolnay/rust-toolchain@stable
+        with: { targets: "${{ matrix.target }}" }
+      - uses: Swatinem/rust-cache@v2
+      - uses: arduino/setup-protoc@v3   # lancedb's build needs protoc
+        with: { repo-token: "${{ secrets.GITHUB_TOKEN }}" }
+      - name: Linux system libraries
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf libssl-dev libdbus-1-dev
+      - name: Fetch PDFium (chromium/7881, matches pdfium-render 0.9.4)
+        shell: bash
+        run: |
+          mkdir -p src-tauri/resources/pdfium pdfium-dl
+          curl -sSL "https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F7881/${{ matrix.pdfium }}" | tar -xz -C pdfium-dl
+          cp pdfium-dl/${{ matrix.lib }} src-tauri/resources/pdfium/ 2>/dev/null || cp pdfium-dl/lib/* src-tauri/resources/pdfium/
+          cp pdfium-dl/LICENSE src-tauri/resources/pdfium/LICENSE-pdfium
+      - run: npm ci
+      - run: cargo test -p vaultlm-core
+      # Export only the signing secrets that exist; an empty APPLE_CERTIFICATE would make the
+      # bundler try (and fail) to import a certificate.
+      - name: Signing secrets (optional)
+        shell: bash
+        env:
+          APPLE_CERTIFICATE: ${{ secrets.APPLE_CERTIFICATE }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ secrets.APPLE_CERTIFICATE_PASSWORD }}
+          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        run: |
+          for v in APPLE_CERTIFICATE APPLE_CERTIFICATE_PASSWORD APPLE_SIGNING_IDENTITY APPLE_ID APPLE_PASSWORD APPLE_TEAM_ID TAURI_SIGNING_PRIVATE_KEY TAURI_SIGNING_PRIVATE_KEY_PASSWORD; do
+            val="${!v}"
+            if [ -n "$val" ]; then
+              { echo "$v<<__EOF__"; echo "$val"; echo "__EOF__"; } >> "$GITHUB_ENV"
+            fi
+          done
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          args: --target ${{ matrix.target }}
+          tagName: v__VERSION__
+          releaseName: "Vault-LM ${{ github.ref_name }}"
+          releaseDraft: true

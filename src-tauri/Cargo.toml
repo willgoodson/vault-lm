@@ -1,0 +1,24 @@
+[package]
+name = "vault-lm"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+description = "Vault-LM desktop app"
+
+[lib]
+name = "vault_lm_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+vaultlm-core = { path = "../crates/vaultlm-core" }
+tauri = { version = "2", features = ["protocol-asset"] }
+tauri-plugin-dialog = "2"
+tauri-plugin-opener = "2"
+tauri-plugin-single-instance = "2"
+tauri-plugin-notification = "2"
+serde.workspace = true
+serde_json.workspace = true
+tokio.workspace = true

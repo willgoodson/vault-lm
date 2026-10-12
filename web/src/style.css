@@ -1,0 +1,112 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-accent-50: oklch(0.97 0.02 290);
+  --color-accent-100: oklch(0.94 0.04 290);
+  --color-accent-200: oklch(0.88 0.08 290);
+  --color-accent-300: oklch(0.80 0.12 290);
+  --color-accent-400: oklch(0.70 0.16 290);
+  --color-accent-500: oklch(0.62 0.20 290);
+  --color-accent-600: oklch(0.55 0.21 290);
+  --color-accent-700: oklch(0.48 0.20 290);
+  --color-accent-800: oklch(0.40 0.17 290);
+  --color-ref-500: oklch(0.75 0.15 70);
+}
+
+@layer base {
+  html, body, #app { @apply h-full; }
+  body { @apply bg-zinc-50 text-zinc-800 antialiased dark:bg-zinc-950 dark:text-zinc-200; font-feature-settings: "cv11", "ss01"; }
+  ::selection { @apply bg-accent-500/25; }
+  * { scrollbar-width: thin; scrollbar-color: color-mix(in oklch, currentColor 20%, transparent) transparent; }
+}
+
+@utility panel { @apply rounded-2xl border border-zinc-200/80 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900; }
+@utility btn { @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition select-none disabled:pointer-events-none disabled:opacity-50; }
+@utility btn-primary { @apply btn bg-accent-600 text-white shadow-sm hover:bg-accent-500; }
+@utility btn-ghost { @apply btn text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-zinc-100; }
+@utility btn-outline { @apply btn border border-zinc-200 bg-white hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:hover:bg-zinc-800; }
+@utility input { @apply w-full rounded-xl border border-zinc-200 bg-white px-3 py-2 text-sm outline-none transition placeholder:text-zinc-400 focus:border-accent-400 focus:ring-4 focus:ring-accent-500/10 dark:border-zinc-700 dark:bg-zinc-900; }
+@utility chip { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium; }
+@utility label { @apply text-[11px] font-semibold uppercase tracking-wider text-zinc-400 dark:text-zinc-500; }
+@utility skeleton { @apply animate-pulse rounded-md bg-zinc-200/70 dark:bg-zinc-800; }
+
+@layer components {
+
+  .prose-note { @apply text-[15px] leading-relaxed; }
+  .prose-note h1 { @apply mt-6 mb-3 text-2xl font-semibold tracking-tight first:mt-0; }
+  .prose-note h2 { @apply mt-6 mb-2 text-lg font-semibold tracking-tight; }
+  .prose-note h3 { @apply mt-4 mb-2 font-semibold; }
+  .prose-note p { @apply my-2.5; }
+  .prose-note ul { @apply my-2 list-disc pl-5; }
+  .prose-note ol { @apply my-2 list-decimal pl-5; }
+  .prose-note li { @apply my-1; }
+  .prose-note strong { @apply font-semibold text-zinc-900 dark:text-white; }
+  .prose-note code { @apply rounded bg-zinc-100 px-1 py-0.5 text-[13px] dark:bg-zinc-800; }
+  .prose-note pre { @apply my-3 overflow-x-auto rounded-xl bg-zinc-100 p-3 dark:bg-zinc-800; }
+  .prose-note blockquote { @apply my-3 border-l-2 border-accent-400 pl-3 text-zinc-500; }
+  .prose-note a:not(.cite) { @apply text-accent-600 underline decoration-accent-500/30 underline-offset-2 dark:text-accent-400; }
+  .prose-note table { @apply my-3 w-full text-sm; }
+  .prose-note th, .prose-note td { @apply border-b border-zinc-200 px-2 py-1 text-left dark:border-zinc-800; }
+
+  .cite { @apply mx-0.5 inline-flex cursor-pointer items-center gap-0.5 rounded-md bg-accent-500/10 px-1.5 py-px align-baseline text-[12px] font-medium text-accent-600 no-underline transition hover:bg-accent-500/20 dark:text-accent-400; }
+  .cite.linked { @apply bg-sky-500/10 text-sky-700 hover:bg-sky-500/20 dark:text-sky-300; }
+  .cite.overview { @apply bg-zinc-500/10 text-zinc-600 hover:bg-zinc-500/20 dark:text-zinc-300; }
+  .cite.ref { @apply bg-ref-500/15 text-amber-700 hover:bg-ref-500/25 dark:text-amber-300; }
+}
+
+@utility menu-item { @apply flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-left text-sm text-zinc-700 hover:bg-zinc-100 dark:text-zinc-300 dark:hover:bg-zinc-800; }
+
+/* ---------- editor (CodeMirror live preview) ---------- */
+.vlm-editor .cm-editor { @apply bg-transparent text-[15px] leading-[1.7] text-zinc-800 outline-none dark:text-zinc-200; }
+.vlm-editor .cm-editor.cm-focused { outline: none; }
+.vlm-editor .cm-scroller { font-family: var(--font-sans); overflow: visible; }
+.vlm-editor .cm-content { @apply py-2 caret-accent-500; }
+.vlm-editor .cm-line { @apply px-0; }
+.vlm-editor .cm-placeholder { @apply text-zinc-400; }
+.vlm-editor .cm-selectionBackground, .vlm-editor .cm-focused .cm-selectionBackground { @apply !bg-accent-500/20; }
+.vlm-editor .cm-cursor { @apply border-l-2 border-accent-500; }
+.vlm-editor .cm-h { @apply font-semibold tracking-tight text-zinc-900 dark:text-white; }
+.vlm-editor .cm-h1 { @apply pt-3 pb-1 text-[1.75em] leading-tight; }
+.vlm-editor .cm-h2 { @apply pt-3 pb-0.5 text-[1.35em] leading-snug; }
+.vlm-editor .cm-h3 { @apply pt-2 text-[1.15em]; }
+.vlm-editor .cm-h4, .vlm-editor .cm-h5, .vlm-editor .cm-h6 { @apply pt-1 text-[1em]; }
+.vlm-editor .cm-strong { @apply font-semibold text-zinc-900 dark:text-white; }
+.vlm-editor .cm-em { @apply italic; }
+.vlm-editor .cm-strike { @apply text-zinc-400 line-through; }
+.vlm-editor .cm-inline-code { @apply rounded bg-zinc-100 px-1 font-mono text-[0.88em] dark:bg-zinc-800; }
+.vlm-editor .cm-codeblock { @apply bg-zinc-100 px-3 font-mono text-[0.88em] dark:bg-zinc-800/80; }
+.vlm-editor .cm-quote { @apply border-l-2 border-accent-400 pl-3 text-zinc-500 dark:text-zinc-400; }
+.vlm-editor .cm-callout-head { @apply rounded-tr-lg bg-accent-500/5 font-semibold text-accent-700 dark:text-accent-300; }
+.vlm-editor .cm-callout-warning, .vlm-editor .cm-callout-caution { @apply border-amber-400 bg-amber-500/5 text-amber-700; }
+.vlm-editor .cm-callout-tip, .vlm-editor .cm-callout-success { @apply border-emerald-400 bg-emerald-500/5 text-emerald-700; }
+.vlm-editor .cm-bullet { @apply inline-block w-3 text-accent-500; }
+.vlm-editor .cm-hr { @apply inline-block h-px w-full bg-zinc-200 align-middle dark:bg-zinc-700; }
+.vlm-editor .cm-task { @apply mr-1.5 size-3.5 translate-y-0.5 cursor-pointer accent-accent-500; }
+.vlm-editor .cm-task-done { @apply text-zinc-400 line-through; }
+.vlm-editor .cm-image { @apply my-2 block max-h-[420px] max-w-full rounded-xl border border-zinc-200 dark:border-zinc-800; }
+.vlm-editor .cm-image.broken { @apply h-10 w-40 bg-zinc-100 dark:bg-zinc-800; }
+.vlm-editor .cm-wikilink { @apply cursor-pointer rounded-md bg-accent-500/10 px-1 font-medium text-accent-600 no-underline transition hover:bg-accent-500/20 dark:text-accent-400; }
+.vlm-editor .cm-wikilink.unresolved { @apply bg-transparent text-zinc-400 underline decoration-dashed underline-offset-4; }
+.vlm-editor .cm-wikilink-raw { @apply text-accent-600 dark:text-accent-400; }
+.vlm-editor .cm-md-link { @apply cursor-pointer text-accent-600 underline decoration-accent-500/30 underline-offset-2 dark:text-accent-400; }
+.vlm-editor .cm-tag { @apply rounded-full bg-zinc-100 px-1.5 py-px text-[0.85em] text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300; }
+.vlm-editor .cm-tok-meta, .vlm-editor .cm-tok-url { @apply text-zinc-400; }
+.vlm-editor .cm-tok-kw { @apply text-fuchsia-600 dark:text-fuchsia-400; }
+.vlm-editor .cm-tok-str { @apply text-emerald-700 dark:text-emerald-400; }
+.vlm-editor .cm-tok-comment { @apply text-zinc-400 italic; }
+.vlm-editor .cm-tok-num { @apply text-amber-700 dark:text-amber-400; }
+.vlm-editor .cm-tok-fn { @apply text-sky-700 dark:text-sky-400; }
+.vlm-editor .cm-properties { @apply mb-3 cursor-text rounded-xl border border-zinc-200 bg-zinc-50/60 px-3 py-2 text-[13px] dark:border-zinc-800 dark:bg-zinc-900/60; }
+.vlm-editor .cm-prop-title { @apply mb-1 text-[11px] font-semibold tracking-wider text-zinc-400 uppercase; }
+.vlm-editor .cm-prop { @apply flex gap-3 py-0.5; }
+.vlm-editor .cm-prop .k { @apply w-28 shrink-0 text-zinc-500; }
+.vlm-editor .cm-prop .v { @apply min-w-0 truncate; }
+.cm-tooltip.cm-tooltip-autocomplete { @apply overflow-hidden rounded-xl border border-zinc-200 bg-white p-1 shadow-xl dark:border-zinc-700 dark:bg-zinc-900; }
+.cm-tooltip-autocomplete > ul { @apply max-h-64 font-sans; }
+.cm-tooltip-autocomplete > ul > li { @apply flex items-baseline gap-2 rounded-lg px-2 py-1 text-sm; }
+.cm-tooltip-autocomplete > ul > li[aria-selected] { @apply bg-accent-500/15 text-zinc-900 dark:text-white; }
+.cm-completionDetail { @apply ml-auto truncate text-[11px] text-zinc-400 not-italic; }
+.cm-tooltip.cm-tooltip-autocomplete { @apply !rounded-xl !border !border-zinc-200 !bg-white p-1 shadow-xl dark:!border-zinc-700 dark:!bg-zinc-900; }
+.vlm-editor .cm-callout-label { @apply mr-0.5; }

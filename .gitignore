@@ -1,0 +1,15 @@
+target/
+src-tauri/gen/
+src-tauri/resources/pdfium/*.dylib
+src-tauri/resources/pdfium/*.dll
+src-tauri/resources/pdfium/*.so
+node_modules/
+data/
+web/dist/
+dist/
+.DS_Store
+*.log
+.env
+.env.*
+*.p12
+*.key
