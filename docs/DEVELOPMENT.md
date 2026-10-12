@@ -34,7 +34,7 @@ examples/demo-vault/   sample notes for trying the app and taking screenshots
 
 - **Rust** (stable) and **Node 22**
 - **protoc**, the Protocol Buffers compiler, which LanceDB needs to build: `brew install protobuf` on macOS, `apt install protobuf-compiler` on Debian/Ubuntu
-- **Linux only:** the WebKitGTK development packages (see the list in `.github/workflows/release.yml`)
+- **Linux only:** `libdbus-1-dev` and `pkg-config` (for the keychain), plus the WebKitGTK development packages for the app itself (see the list in `.github/workflows/release.yml`)
 - **PDFium**, the PDF library, in `src-tauri/resources/pdfium/`. Use build **chromium/7881**, which matches `pdfium-render` 0.9.4. For example, on an Apple Silicon Mac:
   ```sh
   mkdir -p /tmp/pdfium && curl -sSL https://github.com/bblanchon/pdfium-binaries/releases/download/chromium%2F7881/pdfium-mac-arm64.tgz | tar -xz -C /tmp/pdfium
