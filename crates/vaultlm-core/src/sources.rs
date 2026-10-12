@@ -273,14 +273,24 @@ pub fn youtube_id(url: &str) -> Option<String> {
     regex::Regex::new(r"(?:youtube\.com/(?:watch\?(?:.*&)?v=|shorts/|embed/|live/)|youtu\.be/)([\w-]{11})").unwrap().captures(url).map(|c| c[1].to_string())
 }
 
+/// Shown when YouTube's unofficial API answers in an unexpected way: the import is experimental.
+const YT_CHANGED: &str = "YouTube import is experimental and stopped working for this video. YouTube may have changed something; try again later, or paste the transcript into a note.";
+
 /// Caption tracks via the InnerTube player API (Android client), as the earlier version did.
+/// This is YouTube's internal API, not a public one, so it can break without notice.
 async fn youtube_tracks(id: &str) -> Result<(Vec<Value>, String, String)> {
     const VERSION: &str = "20.10.38";
     let res = http().post("https://www.youtube.com/youtubei/v1/player?prettyPrint=false")
         .header("User-Agent", format!("com.google.android.youtube/{VERSION} (Linux; U; Android 14)"))
         .json(&json!({ "context": { "client": { "clientName": "ANDROID", "clientVersion": VERSION } }, "videoId": id }))
         .send().await.map_err(net)?;
-    let v: Value = res.json().await.map_err(net)?;
+    if !res.status().is_success() { return Err(ApiError::new(502, YT_CHANGED)); }
+    let v: Value = res.json().await.map_err(|_| ApiError::new(502, YT_CHANGED))?;
+    let playable = v.pointer("/playabilityStatus/status").and_then(|s| s.as_str()).unwrap_or("OK");
+    if playable != "OK" {
+        let why = v.pointer("/playabilityStatus/reason").and_then(|s| s.as_str()).unwrap_or("");
+        return Err(ApiError::bad_request(if why.is_empty() { YT_CHANGED.to_string() } else { format!("YouTube: {why}") }));
+    }
     let tracks = v.pointer("/captions/playerCaptionsTracklistRenderer/captionTracks").and_then(|t| t.as_array()).cloned().unwrap_or_default();
     if tracks.is_empty() { return Err(ApiError::bad_request("No transcript available for this video (captions are off or unavailable)")); }
     Ok((tracks, v.pointer("/videoDetails/title").and_then(|t| t.as_str()).unwrap_or("").into(), v.pointer("/videoDetails/author").and_then(|t| t.as_str()).unwrap_or("").into()))

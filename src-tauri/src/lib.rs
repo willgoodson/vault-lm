@@ -42,7 +42,7 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let about = AboutMetadataBuilder::new()
         .name(Some("Vault-LM")).version(Some(env!("CARGO_PKG_VERSION")))
         .comments(Some("Your notes and a study partner, all on your computer."))
-        .credits(Some("Built with Tauri, LanceDB, PDFium (BSD-3), ocrs, CodeMirror, Vue."))
+        .credits(Some("MIT License. Built with Tauri, LanceDB, PDFium, ocrs, CodeMirror and Vue. Help → Third-Party Licenses lists every included library."))
         .build();
     let app_menu = SubmenuBuilder::new(app, "Vault-LM")
         .item(&PredefinedMenuItem::about(app, Some("About Vault-LM"), Some(about))?)
@@ -83,6 +83,8 @@ fn build_menu(app: &tauri::AppHandle) -> tauri::Result<Menu<tauri::Wry>> {
     let help = SubmenuBuilder::new(app, "Help")
         .item(&item("models", "Model Settings…", None)?)
         .item(&item("data-folder", "Show App Data Folder", None)?)
+        .separator()
+        .item(&item("licenses", "Third-Party Licenses", None)?)
         .build()?;
     Menu::with_items(app, &[&app_menu, &file, &edit, &view, &window, &help])
 }
@@ -102,6 +104,11 @@ pub fn run() {
         .on_menu_event(|app, ev| {
             let id = ev.id().0.as_str();
             match id {
+                "licenses" => {
+                    if let Ok(f) = app.path().resolve("THIRD-PARTY-NOTICES.txt", tauri::path::BaseDirectory::Resource) {
+                        let _ = tauri_plugin_opener::open_path(f.to_string_lossy().to_string(), None::<&str>);
+                    }
+                }
                 "data-folder" => { let _ = tauri_plugin_opener::open_path(vaultlm_core::paths::data_dir().to_string_lossy().to_string(), None::<&str>); }
                 _ => { let _ = app.emit("menu", json!({ "id": id })); }
             }

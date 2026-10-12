@@ -11,7 +11,8 @@
     "dev": "node server/server.js & vite web",
     "desktop": "tauri dev",
     "desktop:build": "tauri build",
-    "test:core": "cargo test -p vaultlm-core"
+    "test:core": "cargo test -p vaultlm-core",
+    "notices": "node scripts/third-party-notices.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.133.0",

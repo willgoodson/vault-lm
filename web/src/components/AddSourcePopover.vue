@@ -43,7 +43,7 @@ async function addFiles(fileList) {
 <template>
   <Popover :anchor="anchor" :open="open" :width="300" @close="emit('close')">
     <div class="px-1.5 pt-1 pb-2 text-xs text-zinc-500">Add a source to <span class="font-semibold text-zinc-800 dark:text-zinc-100">{{ where }}</span></div>
-    <p v-if="isYouTube" class="px-1.5 pb-1.5 text-[11px] text-accent-600 dark:text-accent-400">YouTube link: the video's transcript will be imported.</p>
+    <p v-if="isYouTube" class="px-1.5 pb-1.5 text-[11px] text-accent-600 dark:text-accent-400">YouTube link: the video's transcript will be imported. <span class="text-zinc-400">Experimental: uses YouTube's unofficial API, so it can stop working.</span></p>
     <form class="flex gap-1.5 px-1" @submit.prevent="addUrl">
       <div class="relative flex-1">
         <Link2 class="pointer-events-none absolute top-1/2 left-2.5 size-3.5 -translate-y-1/2 text-zinc-400" />

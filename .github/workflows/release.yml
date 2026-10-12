@@ -42,6 +42,7 @@ jobs:
           cp pdfium-dl/${{ matrix.lib }} src-tauri/resources/pdfium/ 2>/dev/null || cp pdfium-dl/lib/* src-tauri/resources/pdfium/
           cp pdfium-dl/LICENSE src-tauri/resources/pdfium/LICENSE-pdfium
       - run: npm ci
+      - run: npm run notices   # license texts of every bundled library (needs the PDFium license above)
       - run: cargo test -p vaultlm-core
       # Export only the signing secrets that exist; an empty APPLE_CERTIFICATE would make the
       # bundler try (and fail) to import a certificate.

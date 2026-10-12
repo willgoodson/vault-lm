@@ -42,7 +42,9 @@
       "icons/icon.ico"
     ],
     "resources": {
-      "resources/pdfium/": "pdfium/"
+      "resources/pdfium/": "pdfium/",
+      "resources/THIRD-PARTY-NOTICES.txt": "THIRD-PARTY-NOTICES.txt",
+      "../LICENSE": "LICENSE"
     },
     "copyright": "© 2026 William Goodson. MIT License.",
     "longDescription": "Vault-LM turns a folder of Markdown notes (an Obsidian vault works as-is) into a study partner: cited chat over your notes, flashcards with spaced repetition, quizzes, mind maps and more. Runs on your computer with local models, or with a cloud model you choose.",

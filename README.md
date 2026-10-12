@@ -73,7 +73,7 @@ Flashcards (SM-2 spaced repetition, plus a Spaced Repetition-plugin `#flashcards
 - **Hybrid search:** BM25 keyword search plus vectors, fused with reciprocal-rank fusion, so exact names, numbers and terms are always found. ⌘K uses the same index.
 - **Drag-and-drop** topics and sections in the tree, or use ⋯ → *Move to…*, with Undo. Links, sidecar sources, details and decks follow.
 - **Topic templates** (⚙ → *Manage topic templates…*, or the ▾ next to New topic) with `{{title}} {{date}} {{time}} {{notebook}} {{section}}`.
-- **Sources:** web pages, **YouTube transcripts**, PDFs (scans are OCR'd locally), **EPUB**, **images** (OCR), and .txt/.md/.html. The OCR language model downloads once to `data/tesseract/`.
+- **Sources:** web pages, **YouTube transcripts** (experimental: they use YouTube's unofficial API, so they can stop working), PDFs (scans are OCR'd locally), **EPUB**, **images** (OCR), and .txt/.md/.html. The OCR language model downloads once to `data/tesseract/`.
 
 ## Models
 Click the model name under the chat box (or ⚙ → *Models…*) to choose:
@@ -95,4 +95,4 @@ npm run index           # manual reindex
 Override the models with `CHAT_MODEL` / `EMBED_MODEL`, and the starting vault with `VAULT=/path`.
 
 ## License
-MIT. See [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE). The licenses of the bundled open-source libraries are in `src-tauri/resources/THIRD-PARTY-NOTICES.txt` (in the app: Help → Third-Party Licenses). Regenerate it with `npm run notices` after changing dependencies.
