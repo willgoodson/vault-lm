@@ -9,6 +9,10 @@ on:
   push: { tags: ["v*"] }
   workflow_dispatch:
 
+# The built-in token needs write access to create the draft release and upload installers.
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
