@@ -87,7 +87,9 @@ Release builds are slow (LanceDB is large) and use a lot of memory. On a 16 GB m
 `.github/workflows/release.yml` builds for macOS (Apple Silicon and Intel), Windows and Linux. It attaches the installers to a **draft** GitHub release named after the version in `src-tauri/tauri.conf.json`.
 
 1. Bump `version` in `src-tauri/tauri.conf.json` and in `[workspace.package]` in the root `Cargo.toml`, and add an entry to `CHANGELOG.md`.
-2. Push a tag (`git tag v0.2.0 && git push --tags`), or run the workflow by hand from the Actions tab.
+2. Push a tag: `git tag v0.2.0 && git push --tags`. This starts the build.
+   > [!NOTE]
+   > Prefer the tag over running the workflow by hand. A manual run creates the draft without a tag, and publishing it then creates the tag, which starts a second, duplicate build (cancel it in the Actions tab if that happens).
 3. When all four jobs are green, review the draft on the Releases page and publish it.
 
 **Signing is optional.** With no secrets set, macOS builds are ad-hoc signed and Windows builds are unsigned, so users see a one-time warning. To sign, add these repository secrets; the workflow picks them up automatically:
