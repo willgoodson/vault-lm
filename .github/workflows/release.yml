@@ -68,7 +68,7 @@ jobs:
               { echo "$v<<__EOF__"; echo "$val"; echo "__EOF__"; } >> "$GITHUB_ENV"
             fi
           done
-      - uses: tauri-apps/tauri-action@v0
+      - uses: tauri-apps/tauri-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
