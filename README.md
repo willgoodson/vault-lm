@@ -1,98 +1,105 @@
+<div align="center">
+
+<img src="assets/logo.svg" alt="Vault-LM logo" width="96" />
+
 # Vault-LM
 
-## Desktop app (native Rust, Tauri v2)
+**Turn a folder of Markdown notes into a study partner that runs on your computer.**
 
-The desktop app is the main way to run Vault-LM. It's a native Rust core (`crates/vaultlm-core`) and a Tauri shell (`src-tauri/`) that reuses the Vue UI in `web/` over IPC, with no local server and no open ports.
+Cited chat over your notes, flashcards with spaced repetition, quizzes, mind maps and audio overviews.
+It works with local models through [Ollama](https://ollama.com), so nothing has to leave your machine.
 
-| | |
+[![Latest release](https://img.shields.io/github/v/release/willgoodson/vault-lm?label=download)](https://github.com/willgoodson/vault-lm/releases/latest)
+[![CI](https://github.com/willgoodson/vault-lm/actions/workflows/ci.yml/badge.svg)](https://github.com/willgoodson/vault-lm/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+</div>
+
+![Chat with cited answers from your notes](docs/screenshots/chat.png)
+
+## Features
+
+- **Chat with your notes.** Answers come only from the notebook you're in, and every claim links back to the note it came from.
+- **Study tools ("Studio").**
+  - Flashcards with spaced repetition
+  - Quizzes, mind maps and Explain-back (the Feynman technique)
+  - Summaries, FAQs and study guides
+  - A two-host audio overview you can listen to
+- **Review dashboard.** Cards due today, your weak spots from missed questions, and an activity heatmap.
+- **A real Markdown editor.** It has live preview, `[[wikilinks]]`, backlinks and related notes, a graph of your notes, and ⌘K search.
+- **Import sources.** Bring in web pages, PDFs (scans are read with on-device OCR), EPUBs, images and YouTube transcripts.
+- **Works with Obsidian.** Your vault stays a plain folder of `.md` files, and Vault-LM never touches Obsidian's settings.
+- **Your choice of model.** Use local models through Ollama, Claude (Anthropic), or any OpenAI-compatible service. API keys are stored in your system keychain.
+
+![Live-preview editor with links, backlinks and related topics](docs/screenshots/editor.png)
+
+## Download
+
+Get the latest version from the **[Releases page](https://github.com/willgoodson/vault-lm/releases/latest)**:
+
+| System | File |
 |---|---|
-| Run in development | `npm run desktop` |
-| Build the app | `npm run desktop:build` (unsigned locally; CI signs and notarizes) |
-| Core tests | `npm run test:core` |
-| Build prerequisites | Rust, Node 22, `protoc` (`brew install protobuf`), PDFium in `src-tauri/resources/pdfium/` (CI downloads it) |
+| macOS (Apple Silicon) | `Vault-LM_<version>_aarch64.dmg` |
+| macOS (Intel) | `Vault-LM_<version>_x64.dmg` |
+| Windows 10/11 | `Vault-LM_<version>_x64-setup.exe` (or the `.msi`) |
+| Linux | `.AppImage`, `.deb` (Debian/Ubuntu) or `.rpm` (Fedora) |
 
-- **Data:** app data lives in the OS app-data folder (`~/Library/Application Support/com.vaultlm.Vault-LM` on macOS). On first launch, your data from the Node version (`data/`) is imported: indexes are reused without re-embedding, and decks, details, progress and chats come along. API keys are stored in the **OS keychain**.
-- **Engines:**
-  - LanceDB (the same index format as before, plus BM25 full-text search)
-  - PDFium (layout-aware PDF conversion that detects real bold text)
-  - ocrs (on-device OCR; its models download once, about 12 MB)
-  - the OS's own voices for audio overviews (macOS `say`, Windows System.Speech, Linux espeak-ng)
-  - models via Ollama, Anthropic (raw HTTP), or any OpenAI-compatible server
-- **Releases:** `.github/workflows/release.yml` builds macOS (arm64 and x64), Windows and Linux installers on tag push, once the signing secrets are set.
-- The logo is `assets/logo.svg`. The icons in `src-tauri/icons/` are generated from it with `npx tauri icon assets/logo-1024.png`.
+> [!NOTE]
+> The app isn't code-signed yet, so your system asks you to confirm the first time you open it:
+> - **macOS:** open the app once, then go to **System Settings → Privacy & Security** and click **Open Anyway**.
+> - **Windows:** on the "Windows protected your PC" screen, click **More info → Run anyway**.
 
-The Node server below is the original implementation. It stays as a reference until you've confirmed the desktop app covers everything you use.
+## Getting started
 
+1. **Install a model.** Install [Ollama](https://ollama.com/download), then download a chat model and an embedding model (used for search):
+   ```sh
+   ollama pull llama3.1:8b
+   ollama pull nomic-embed-text
+   ```
+   Prefer a cloud model? Skip this step and add a key in **Models…** (⌘, on Mac) once the app is open. You'll still need an embedding model for search: either Ollama's or an OpenAI-compatible one.
+2. **Open Vault-LM** and choose a folder of notes, or create a new vault. To try it with sample notes, download [`examples/demo-vault`](examples/demo-vault) and open that folder.
+3. **Pick a notebook** in the sidebar and ask a question, or open **Studio** to make flashcards and quizzes.
 
-A standalone, local NotebookLM plus a "second brain" app for Markdown vaults. It runs on Ollama (`llama3.1:8b` and `nomic-embed-text`), LanceDB, CodeMirror 6 and kokoro-js. Nothing leaves your machine.
+New to it? The **[User guide](docs/USER-GUIDE.md)** explains how notebooks, sections and topics work, the two chat modes, and every study tool.
 
-Vaults stay **plain folders that Obsidian can open**. Vault-LM never writes to `.obsidian/` (it only reads the attachment setting), uses standard `[[wikilinks]]` and YAML frontmatter, and deletes into `.trash/`. It doesn't depend on Obsidian.
+## How your notes are organised
 
-## Structure
-- **Notebook**: a folder under the vault's notebook root (⚙ next to *Notebooks*; defaults to the vault root, or set it to e.g. `Efforts/`).
-- **Section**: a subfolder of a notebook.
-- **Topic**: a single `.md` note.
-- **Sources**: imported URLs and PDFs, stored next to whatever they belong to:
-  - `<notebook>/sources/`
-  - `<section>/sources/`
-  - `<dir>/sources/<Topic>/` for a topic. Your note itself is never edited.
-
-The **Notebooks tree sets the scope.** Browsing *Vault files*, search or citations only opens tabs and never changes the selection. Each notebook keeps its own tabs, selection, chat, mode and Studio state. These are saved per vault in `data/vaults/<slug>/ui-state.json`.
-
-## Chat modes (always within the notebook)
-| Mode | Context |
+| In Vault-LM | On disk |
 |---|---|
-| **Reference** (default) | your selection first, then the most relevant parts of the rest of the notebook, labeled by section |
-| **Focused** | only your selection, plus the auto-generated **Notebook Overview** (`<notebook>/_studio/Notebook Overview.md`) for background |
+| **Notebook** | a top-level folder |
+| **Section** | a subfolder |
+| **Topic** | a single `.md` note |
 
-## Studio
-Flashcards (SM-2 spaced repetition, plus a Spaced Repetition-plugin `#flashcards` mirror), quizzes, mind maps, explain-back (Feynman) grading, briefs and audio overviews.
-- Each tool can target the notebook, the section or the topic. They're labeled by name.
-- Outputs go to `_studio/`, which is never indexed.
+Generated study material goes into a `_studio/` folder inside each notebook. Imported sources are saved as Markdown next to the notes they belong to.
 
-## Editor and second-brain features
-- **Live-preview editor** (CodeMirror 6). Markdown renders inline except on the line you're editing.
-  - Renders: `[[links]]` as chips, images, checkboxes, callouts, a Properties panel, `#tags`.
-  - `[[` autocomplete for notes and headings, `#` for tags.
-  - Autosaves, and detects conflicting edits made outside the app.
-  - Pasting or dropping an image saves it as an attachment.
-  - Enter on an empty list item ends the list.
-- **Rename** a topic, section or notebook and `[[links]]` across the vault update. A topic's sidecar sources move with it.
-- **Side panel:** properties, tags, outline, links, backlinks, **unlinked mentions** (one-click "Link"), **related topics** by meaning, and **Suggest links** from the AI.
-- **Graph** tab for each notebook. Nodes are colored by section, with an optional layer of "similar notes" edges.
-- **Select text** in the editor to Explain, Simplify (with replace), Make a flashcard, Quiz yourself, or Ask in chat.
-- **⌘K** searches note names, headings, full text and `#tags`, with an "Ask in chat" fallback.
+## Privacy
 
-## Studying and organizing (v4)
-- **Details and goals** (⋯ → *Edit details…* on a notebook or section) cover description, goals, status, due date and color. They're stored in Vault-LM's `data/` folder, never in the vault. They steer chat answers, the notebook overview, and every Studio tool.
-- **Review dashboard** (sidebar → *Review*):
-  - cards due across every notebook, with one mixed review session
-  - **weak spots** from missed quiz questions, "Again" cards and explain-back gaps, weighted toward recent attempts, with **Drill weak spots**
-  - an activity heatmap, quiz accuracy, and upcoming due dates
-- **Chats:** several named chats per notebook (titled automatically), and **Save as topic** on any answer, either as a new note or appended to an existing one.
-- **Hybrid search:** BM25 keyword search plus vectors, fused with reciprocal-rank fusion, so exact names, numbers and terms are always found. ⌘K uses the same index.
-- **Drag-and-drop** topics and sections in the tree, or use ⋯ → *Move to…*, with Undo. Links, sidecar sources, details and decks follow.
-- **Topic templates** (⚙ → *Manage topic templates…*, or the ▾ next to New topic) with `{{title}} {{date}} {{time}} {{notebook}} {{section}}`.
-- **Sources:** web pages, **YouTube transcripts** (experimental: they use YouTube's unofficial API, so they can stop working), PDFs (scans are OCR'd locally), **EPUB**, **images** (OCR), and .txt/.md/.html. The OCR language model downloads once to `data/tesseract/`.
+- Your notes stay in your folder, and the search index stays on your computer.
+- With a local model, nothing leaves your machine.
+- With a cloud model, your question and the matching excerpts from your notes go to that provider. The app shows ☁ next to the model name whenever that's the case.
+- There is no account, telemetry or analytics.
 
-## Models
-Click the model name under the chat box (or ⚙ → *Models…*) to choose:
-- **Local · Ollama:** the installed models, with size and quantization, and **Download** to pull new ones (progress shows in the corner).
-- **Claude · Anthropic:** paste an API key, then pick from the live model list. Effort can be low, medium or high. Supported models opt into Anthropic's server-side refusal fallback.
-- **OpenAI-compatible:** OpenAI, OpenRouter, Groq, LM Studio, llama.cpp, vLLM and so on. Set a base URL and an optional key.
-- **Search embeddings:** Ollama or OpenAI-compatible (Anthropic has no embeddings API). Each embedding model gets its own index, so switching rebuilds it once and switching back is instant.
+## Building from source
 
-Settings and keys are stored in `data/models.json` (file mode 600) and are never sent to the browser. `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` work as fallbacks. With a cloud model, your question and the retrieved note excerpts go to that provider, and the app shows ☁ next to the model name.
+You need Rust, Node 22, `protoc` and the PDFium library (setup in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md#prerequisites)). Then:
 
-## Run
 ```sh
-ollama serve            # if not already running
-npm run build           # build the UI (after UI changes)
-npm run server          # http://localhost:3737
-npm run dev             # hot-reload UI on :5173 + server
-npm run index           # manual reindex
+git clone https://github.com/willgoodson/vault-lm && cd vault-lm
+npm ci
+npm run desktop          # run in development
+npm run desktop:build    # build an installer for this machine
 ```
-Override the models with `CHAT_MODEL` / `EMBED_MODEL`, and the starting vault with `VAULT=/path`.
+
+See **[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)** for the architecture, the tests and the release process.
+
+## Contributing
+
+Bug reports and ideas are welcome: please [open an issue](https://github.com/willgoodson/vault-lm/issues/new/choose). If you'd like to contribute code, read [CONTRIBUTING.md](CONTRIBUTING.md) first.
 
 ## License
-MIT. See [LICENSE](LICENSE). The licenses of the bundled open-source libraries are in `src-tauri/resources/THIRD-PARTY-NOTICES.txt` (in the app: Help → Third-Party Licenses). Regenerate it with `npm run notices` after changing dependencies.
+
+[MIT](LICENSE) © 2026 William Goodson.
+
+Vault-LM bundles open-source libraries under their own licenses. They're listed in [`THIRD-PARTY-NOTICES.txt`](src-tauri/resources/THIRD-PARTY-NOTICES.txt), and in the app under **Help → Third-Party Licenses**.
+
+Vault-LM isn't affiliated with Obsidian, Ollama, Anthropic, OpenAI or Google.

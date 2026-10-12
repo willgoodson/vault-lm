@@ -1,6 +1,7 @@
 import path from 'node:path';
 
-export const DATA = path.resolve(import.meta.dirname, '../data');
+// VAULTLM_DATA points the server at another data folder (used for demos/tests).
+export const DATA = process.env.VAULTLM_DATA ? path.resolve(process.env.VAULTLM_DATA) : path.resolve(import.meta.dirname, '../data');
 // Chat/embedding models are configured in data/models.json (see models.js); env CHAT_MODEL / EMBED_MODEL set the defaults.
 export const K_PRIMARY = 8;
 export const K_REFERENCE = 5;

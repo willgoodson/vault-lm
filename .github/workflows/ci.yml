@@ -1,0 +1,24 @@
+# Checks every push to main and every pull request: core unit tests and the UI build.
+# (Installers are built by release.yml.)
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with: { node-version: 22, cache: npm }
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - uses: arduino/setup-protoc@v3   # lancedb's build needs protoc
+        with: { repo-token: "${{ secrets.GITHUB_TOKEN }}" }
+      - run: npm ci
+      - run: npm run build
+      - run: cargo test -p vaultlm-core

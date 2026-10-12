@@ -1,0 +1,46 @@
+name: Bug report
+description: Something isn't working as expected
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Thanks for reporting! Please don't paste private notes or API keys here.
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open a vault with …
+        2. Click …
+        3. See …
+    validations: { required: true }
+  - type: input
+    id: version
+    attributes:
+      label: Vault-LM version
+      description: Shown in About Vault-LM.
+      placeholder: "0.1.0"
+    validations: { required: true }
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options: [macOS (Apple Silicon), macOS (Intel), Windows, Linux]
+    validations: { required: true }
+  - type: input
+    id: model
+    attributes:
+      label: Model
+      description: Which chat and embedding models were you using, if relevant?
+      placeholder: "Ollama llama3.1:8b + nomic-embed-text"
+  - type: textarea
+    id: extra
+    attributes:
+      label: Anything else?
+      description: Screenshots, error messages, or details about the note or file involved.
