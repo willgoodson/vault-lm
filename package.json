@@ -1,5 +1,6 @@
 {
   "name": "vault-lm",
+  "license": "MIT",
   "private": true,
   "type": "module",
   "scripts": {

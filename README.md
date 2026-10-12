@@ -93,3 +93,6 @@ npm run dev             # hot-reload UI on :5173 + server
 npm run index           # manual reindex
 ```
 Override the models with `CHAT_MODEL` / `EMBED_MODEL`, and the starting vault with `VAULT=/path`.
+
+## License
+MIT. See [LICENSE](LICENSE).
